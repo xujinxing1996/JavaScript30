@@ -15,8 +15,34 @@
     </ul>
   </form>
 <script>
-const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+  void function() {
+    const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+    let data = [];
+    const xhr = new XMLHttpRequest();
+    xhr.addEventListener('load', event => {
+      data = JSON.parse(event.currentTarget.response)
+      console.log('response', data);
+    });
+    xhr.open('get', endpoint);
+    xhr.send();
 
+    function findMatch(data, search) {
+      return data.filter(item => {
+        let regexp = new RegExp(search, 'gi');
+        console.log('item', item);
+        return item.city.match(regexp) || item.state.match(regexp)
+      });
+    }
+
+    document.querySelector('.search').addEventListener('keyup', function(event) {
+      console.log('this', this.value);
+      document.querySelector('.suggestions').innerHTML = findMatch(data, this.value).map(item => {
+        let regexp = new RegExp(this.value, 'gi');
+        item.city.replace(regexp, `<span  class="hl">${this.value}</span>`);
+        return `<li>${item.city}</li>`;
+      }).join('');
+    }, false);
+  }();
 </script>
 </body>
 </html>
